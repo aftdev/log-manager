@@ -1,32 +1,34 @@
 {
-    "name": "aftdev/log-manager",
-    "description": "Log manager for monolog",
-    "license": "BSD-3-Clause",
-    "keywords": ["monolog"],
-    "require": {
-        "php": "^8.0",
-        "aftdev/service-manager": "^1.1",
-        "monolog/monolog": "^1.24.0"
+  "name": "aftdev/log-manager",
+  "description": "Log manager for monolog",
+  "license": "BSD-3-Clause",
+  "keywords": [
+    "monolog"
+  ],
+  "require": {
+    "php": "^8.0",
+    "aftdev/service-manager": "^1.1",
+    "monolog/monolog": "^2.3.5"
+  },
+  "autoload": {
+    "psr-4": {
+      "AftDev\\Log\\": "src/"
     },
-    "autoload": {
-        "psr-4": {
-            "AftDev\\Log\\": "src/"
-        },
-        "classmap": [
-            "src/"
-        ]
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "AftDevTest\\Log\\": "tests/"
-        }
-    },
-    "scripts": {
-        "test": "phpunit --colors=always"
-    },
-    "extra": {
-        "laminas": {
-            "config-provider": "AftDev\\Log\\ConfigProvider"
-        }
+    "classmap": [
+      "src/"
+    ]
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "AftDevTest\\Log\\": "tests/"
     }
+  },
+  "scripts": {
+    "test": "phpunit --colors=always"
+  },
+  "extra": {
+    "laminas": {
+      "config-provider": "AftDev\\Log\\ConfigProvider"
+    }
+  }
 }
