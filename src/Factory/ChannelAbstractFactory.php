@@ -22,8 +22,6 @@ class ChannelAbstractFactory extends ReflectionAbstractFactory
 
     /**
      * Return formatter based on options.
-     *
-     * @throws \Interop\Container\Exception\ContainerException
      */
     protected function getFormatter(ContainerInterface $container, array $options): FormatterInterface
     {
