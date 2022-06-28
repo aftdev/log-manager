@@ -10,6 +10,8 @@ use Monolog\Formatter\HtmlFormatter;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Logger;
+use Monolog\Processor\MemoryUsageProcessor;
+use Monolog\Processor\ProcessorInterface;
 use Prophecy\Argument;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
@@ -93,5 +95,65 @@ class ChannelAbstractFactoryTest extends TestCase
 
         $handler = current($logger->getHandlers());
         $this->assertSame($formatter->reveal(), $handler->getFormatter());
+    }
+
+    public function testEmptyProcessors()
+    {
+        $container = $this->prophesize(ContainerInterface::class);
+
+        $factory = new ChannelAbstractFactory();
+
+        /** @var Logger $handler */
+        $logger = $factory($container->reveal(), RotatingFileHandler::class, [
+            'level' => 'debug',
+            'filename' => 'test name',
+        ]);
+
+        $handler = current($logger->getHandlers());
+        $this->expectException(\LogicException::class);
+
+        $handler->popProcessor();
+    }
+
+    public function testProcessors()
+    {
+        $container = $this->prophesize(ContainerInterface::class);
+        $container->has(Resolver::class)->willReturn(false);
+        $container->has(\Monolog\Formatter\LineFormatter::class)->willReturn(false);
+        $processor = $this->prophesize(ProcessorInterface::class);
+
+        $container->has(MemoryUsageProcessor::class)->willReturn(false);
+        $container->has('FancyProcessor')->willReturn(true);
+        $container->get('FancyProcessor', Argument::cetera())
+            ->willReturn($processor->reveal())
+            ->shouldBeCalledTimes(1)
+        ;
+
+        $factory = new ChannelAbstractFactory();
+
+        /** @var Logger $handler */
+        $logger = $factory($container->reveal(), RotatingFileHandler::class, [
+            'level' => 'debug',
+            'filename' => 'test name',
+            'processors' => [
+                MemoryUsageProcessor::class,
+                'FancyProcessor',
+            ],
+        ]);
+
+        $handler = current($logger->getHandlers());
+
+        $processors = [];
+
+        try {
+            while ($proc = $handler->popProcessor()) {
+                $processors[] = $proc;
+            }
+        } catch (\LogicException $e) {
+        }
+
+        $this->assertCount(2, $processors);
+        $this->assertSame($processor->reveal(), $processors[0]);
+        $this->assertInstanceOf(MemoryUsageProcessor::class, $processors[1]);
     }
 }

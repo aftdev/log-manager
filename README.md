@@ -9,7 +9,7 @@ class X {
     __construct(LogManager $logManager) {
         // Use default channel.
         $logManager->warning('Default channel warning');
-        
+
         // Or
         $logManager->channel()->warning('Default channel warning');
 
@@ -17,12 +17,12 @@ class X {
         $logManager->channel('daily')->warning('Daily Warning');
     }
 }
-
 ```
 
 ### Default Logger
 
-By default the `Psr\Logger\Interface` is linked to the default handler from the configuration
+By default the `Psr\Logger\Interface` is linked to the default handler from the
+configuration
 
 You can easily use it in your classes.
 
@@ -35,6 +35,7 @@ __construct(\Psr\Log\LoggerInterface $logger) {
 ## Config
 
 Default configurations include:
+
 - `daily` -> rotating file logger in the /data/log folder. (RotatingFileHandler)
 - `syslog` -> will use the syslog. (SyslogHandler)
 - `stream` -> to use a stream. (StreamHandler)
@@ -42,6 +43,8 @@ Default configurations include:
 All handlers provided by monolog are usable by the log manager
 
 ```php
+use Monolog\Level;
+
 return [
     'log' => [
          'default' => 'stack',
@@ -55,7 +58,7 @@ return [
              'daily' => [
                  'plugin' => 'daily',
                  'options' => [
-                     'level' => Logger::DEBUG,
+                     'level' => Level::Debug,
                      'filename' => 'data/log/application.log',
                      'maxFiles' => 5,
                  ],
@@ -64,18 +67,20 @@ return [
                  'plugin' => 'stream',
                  'options' => [
                      'filename' => 'path_to_file',
-                     'level' => Logger::DEBUG,
+                     'level' => Level::Debug,
                  ],
              ],
          ],
     ];
-] 
+]
 ```
 
 ## Monolog Handlers
 
-Any monolog [handlers](https://github.com/Seldaek/monolog/blob/master/doc/02-handlers-formatters-processors.md#handlers) are available to be used via the `'plugin'` option.
-The `options` values will be used as arguments when creating the handler.
+Any monolog
+[handlers](https://github.com/Seldaek/monolog/blob/master/doc/02-handlers-formatters-processors.md#handlers)
+are available to be used via the `'plugin'` option. The `options` values will be
+used as arguments when creating the handler.
 
 ```php
 return [
@@ -90,7 +95,7 @@ return [
              ],
          ],
     ];
-] 
+]
 ```
 
 If you require more customization you can create your own handler factories.
@@ -113,10 +118,10 @@ return [
              ],
          ],
     ];
-] 
+]
 ```
 
-## Stack 
+## Stack
 
 To create a logger that will use several handlers, use the `stack` plugin.
 
@@ -133,7 +138,7 @@ return [
             ],
             'handler_1' => [],
             'handler_2' => [],
-         ],   
+         ],
     ],
 ];
 ```
@@ -145,10 +150,11 @@ $logManager->stack('handler_1', 'handler_2')->warning('Warning');
 $logManager->stack(['handler_1', 'handler_2'])->warning('Warning - Array notations');
 ```
 
-### Formatters
+## Formatters
 
-By default each handler will use the default LineFormatter formatter with default options.
-You can easily customize it by using the  the `formatter` option.
+By default each handler will use the default LineFormatter formatter with
+default options. You can easily customize it by using the the `formatter`
+option.
 
 ```php
 return [
@@ -174,15 +180,17 @@ return [
          ],
     ],
 ];
+```
 
-The formatter will be fetched from the Service Manager so if you require more customization uses that feature.
+The formatter will be fetched from the Service Manager so if you require more
+customization uses that feature.
 
 ```php
 return [
     'dependencies' => [
-       'factories' => [
-            'MyCustomFormatter' => InvokableFactory::class,
-       ]
+         'factories' => [
+              'MyCustomFormatter' => FormatterFactory::class,
+          ]
     ],
     'log' => [
          'plugins' => [
@@ -190,6 +198,40 @@ return [
                 'plugin' => 'daily',
                 'options' => [
                     'formatter' => 'MyCustomFormatter',
+                ],
+            ],
+         ],
+    ],
+];
+```
+
+## Processors
+
+To add extra context to your log messages automatically you can use the
+`processors` options.
+
+Monolog comes out of the box with a bunch of
+[processors](https://github.com/Seldaek/monolog/blob/main/doc/02-handlers-formatters-processors.md#processor)
+
+Similarly to the formatter, the service manager is used to build the processors
+instances.
+
+```php
+return [
+    'dependencies' => [
+          'factories' => [
+              'MyCustomProcessor' => ProcessorFactory::class,
+          ]
+    ],
+    'log' => [
+         'plugins' => [
+            'custom_formatter' => [
+                'plugin' => 'daily',
+                'options' => [
+                    'processors' => [
+                         Monolog\Processor\MemoryUsage::class,
+                         'MyCustomProcessor',
+                    ]
                 ],
             ],
          ],

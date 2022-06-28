@@ -3,7 +3,7 @@
 namespace AftDev\Log;
 
 use AftDev\Log\Factory\ChannelAbstractFactory;
-use Monolog\Logger;
+use Monolog\Level;
 use Psr\Log\LoggerInterface;
 
 class ConfigProvider
@@ -37,15 +37,15 @@ class ConfigProvider
                     'channels' => ['daily'],
                 ],
                 'daily' => [
-                    'level' => Logger::DEBUG,
+                    'level' => Level::Debug,
                     'filename' => 'data/log/daily.log',
                     'maxFiles' => 5,
                 ],
                 'filesystem' => [
-                    'service' => 'stream',
+                    'plugin' => 'stream',
                     'options' => [
                         'filename' => 'data/log/application.log',
-                        'level' => Logger::DEBUG,
+                        'level' => Level::Debug,
                     ],
                 ],
             ],
