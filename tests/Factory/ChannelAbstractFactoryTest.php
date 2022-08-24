@@ -25,6 +25,7 @@ class ChannelAbstractFactoryTest extends TestCase
     public function testFactory()
     {
         $container = $this->prophesize(ContainerInterface::class);
+        $container->has(Argument::any())->willReturn(false);
 
         $factory = new ChannelAbstractFactory();
 
@@ -40,6 +41,7 @@ class ChannelAbstractFactoryTest extends TestCase
     public function testFormatter()
     {
         $container = $this->prophesize(ContainerInterface::class);
+        $container->has(Argument::any())->willReturn(false);
 
         $factory = new ChannelAbstractFactory();
 
@@ -77,7 +79,7 @@ class ChannelAbstractFactoryTest extends TestCase
     public function testFormatterFromContainer()
     {
         $container = $this->prophesize(ContainerInterface::class);
-        $container->has(Resolver::class)->willReturn(false);
+        $container->has(Argument::any())->willReturn(false);
         $formatter = $this->prophesize(FormatterInterface::class);
 
         $container->has('FancyFormatter')->willReturn(true);
@@ -100,6 +102,7 @@ class ChannelAbstractFactoryTest extends TestCase
     public function testEmptyProcessors()
     {
         $container = $this->prophesize(ContainerInterface::class);
+        $container->has(Argument::any())->willReturn(false);
 
         $factory = new ChannelAbstractFactory();
 
